@@ -1,0 +1,4 @@
+
+- name: restart firewalld
+  become: yes
+  service: name=firewalld enabled=yes state=restarted
