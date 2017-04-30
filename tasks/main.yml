@@ -1,30 +1,5 @@
 ---
 
-# The proxy server - proxy server:port number
-- name: use a proxy for yum
-  when: base_proxy_url is defined and ansible_os_family == 'RedHat'
-  lineinfile:
-    dest: /etc/yum.conf
-    state: present
-    regexp: '^proxy'
-    line: "proxy={{  base_proxy_url }}"
-
-- name: no proxy for yum
-  when: base_proxy_url is undefined and ansible_os_family == 'RedHat'
-  lineinfile:
-    dest: /etc/yum.conf
-    state: absent
-    regexp: '^proxy'
-
-# We need this for python-httplib2, which is a dependancy for uri
-# Can be removed if we use Ansible 2.1
-- name: Install EPEL repository
-  when: ansible_os_family == 'RedHat'
-  become: yes
-  yum: name=epel-release state=present update_cache=yes
-  tags:
-    - server
-
 - name: Install system packages
   become: yes
   when: ansible_os_family == 'RedHat'
@@ -47,20 +22,6 @@
   yum: name={{ item }} state=present update_cache=yes
   with_items: '{{ server.packages }}'
   tags:
-    - server
-
-- name: Configure the UTC timezone
-  become: yes
-  copy: src=timezone dest=/etc/timezone
-  tags:
-    - timezone
-    - server
-
-- name: Configure the timezone to Universal Time
-  become: yes
-  file: src=/usr/share/zoneinfo/UTC dest=/etc/localtime state=link force=yes backup=yes
-  tags:
-    - timezone
     - server
 
 - name: ensure firewalld is running
