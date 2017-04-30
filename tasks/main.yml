@@ -3,7 +3,10 @@
 - name: Install system packages
   become: yes
   when: ansible_os_family == 'RedHat'
-  yum: name={{ item }} state=present update_cache=yes
+  yum:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
   retries: 3
   with_items:
     - libsemanage-python
@@ -19,7 +22,10 @@
 - name: Install Extra Packages
   become: yes
   when: server.packages is defined and ansible_os_family == 'RedHat'
-  yum: name={{ item }} state=present update_cache=yes
+  yum:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
   with_items: '{{ server.packages }}'
   tags:
     - server
@@ -34,8 +40,8 @@
 
 - name: Grant SSH access for buildserver
   become: yes
+  when: buildserver_ip_address is defined and ansible_os_family == 'RedHat'
   firewalld: rich_rule='rule family="ipv4" source address="{{ buildserver_ip_address }}" port port="22" protocol="tcp" accept' permanent=true state=enabled immediate=yes
-
   notify: restart firewalld
   tags:
     - firewall
