@@ -2,15 +2,15 @@
 
 # The proxy server - proxy server:port number
 - name: use a proxy for yum
-  when: base_proxy_url is defined and ansible_os_family == "RedHat"
+  when: base_proxy_url is defined and ansible_os_family == 'RedHat'
   lineinfile:
     dest: /etc/yum.conf
     state: present
     regexp: '^proxy'
     line: "proxy={{  base_proxy_url }}"
 
-- name: no a proxy for yum
-  when: base_proxy_url is  undefined and ansible_os_family == "RedHat"
+- name: no proxy for yum
+  when: base_proxy_url is undefined and ansible_os_family == 'RedHat'
   lineinfile:
     dest: /etc/yum.conf
     state: absent
@@ -19,16 +19,16 @@
 # We need this for python-httplib2, which is a dependancy for uri
 # Can be removed if we use Ansible 2.1
 - name: Install EPEL repository
+  when: ansible_os_family == 'RedHat'
   become: yes
   yum: name=epel-release state=present update_cache=yes
-  when: ansible_os_family == "RedHat"
   tags:
     - server
 
 - name: Install system packages
   become: yes
+  when: ansible_os_family == 'RedHat'
   yum: name={{ item }} state=present update_cache=yes
-  when: ansible_os_family == "RedHat"
   retries: 3
   with_items:
     - libsemanage-python
@@ -43,9 +43,9 @@
 
 - name: Install Extra Packages
   become: yes
+  when: server.packages is defined and ansible_os_family == 'RedHat'
   yum: name={{ item }} state=present update_cache=yes
   with_items: '{{ server.packages }}'
-  when: server.packages is defined and ansible_os_family == "RedHat"
   tags:
     - server
 
@@ -65,8 +65,8 @@
 
 - name: ensure firewalld is running
   become: yes
+  when: buildserver_ip_address is defined and ansible_os_family == 'RedHat'
   service: name=firewalld enabled=yes state=started
-  when: buildserver_ip_address is defined and ansible_os_family == "RedHat"
   tags:
     - firewall
     - server
@@ -74,7 +74,7 @@
 - name: Grant SSH access for buildserver
   become: yes
   firewalld: rich_rule='rule family="ipv4" source address="{{ buildserver_ip_address }}" port port="22" protocol="tcp" accept' permanent=true state=enabled immediate=yes
-  when: buildserver_ip_address is defined and ansible_os_family == "RedHat"
+
   notify: restart firewalld
   tags:
     - firewall
