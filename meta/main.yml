@@ -1,8 +1,8 @@
----
+
 galaxy_info:
   author: bbaassssiiee
   description: Common Enterprise Role for yum proxies etc.
-  company: ---
+  company: 
 
   license: MIT
 
