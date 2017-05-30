@@ -3,3 +3,7 @@
 - name: restart firewalld
   become: yes
   service: name=firewalld enabled=yes state=restarted
+
+- name: update-ca-trust
+  become: yes
+  command: update-ca-trust
