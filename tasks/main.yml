@@ -41,7 +41,10 @@
 - name: ensure firewalld is running
   become: yes
   when: buildserver_ip_address is defined and ansible_os_family == 'RedHat'
-  service: name=firewalld enabled=yes state=started
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
   tags:
     - firewall
     - server
@@ -49,7 +52,11 @@
 - name: Grant SSH access for buildserver
   become: yes
   when: buildserver_ip_address is defined and ansible_os_family == 'RedHat'
-  firewalld: rich_rule='rule family="ipv4" source address="{{ buildserver_ip_address }}" port port="22" protocol="tcp" accept' permanent=true state=enabled immediate=yes
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ buildserver_ip_address }}" port port="22" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+    immediate: yes
   notify: restart firewalld
   tags:
     - firewall

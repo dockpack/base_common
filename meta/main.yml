@@ -1,9 +1,9 @@
 ---
-
+# Standards: 0.2
 galaxy_info:
-  author: bbaassssiiee
-  description: Common Enterprise Role for yum proxies etc.
-  company:
+  author: Bas Meijer
+  description: Common Enterprise Stuff
+  company: bbaassssiiee
 
   license: MIT
 
@@ -23,5 +23,7 @@ galaxy_info:
   galaxy_tags:
     - system
     - development
+    - buildserver
+    - proxy
 
 dependencies: []
