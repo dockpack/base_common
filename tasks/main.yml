@@ -7,18 +7,18 @@
     owner: root
     group: root
     mode: 0755
+  tags:
+    - common
 
-- name: Install system packages
-  become: yes
+- name: Install redhat packages
+  become: true
   when: ansible_os_family == 'RedHat'
-  yum:
+  package:
     name: "{{ item }}"
     state: present
-    update_cache: yes
   retries: 3
   with_items:
-    - libsemanage-python
     - policycoreutils-python
+    - libsemanage-python
   tags:
-    - server
-
+    - common
