@@ -19,32 +19,6 @@
   with_items:
     - libsemanage-python
     - policycoreutils-python
-    - curl
-    - wget
-    - unzip
-    - bzip2
-    - net-tools
   tags:
     - server
 
-- name: Install Extra Packages
-  become: yes
-  when: server.packages is defined and ansible_os_family == 'RedHat'
-  yum:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  with_items: '{{ server.packages }}'
-  tags:
-    - server
-
-- name: ensure firewalld is running
-  become: yes
-  when: buildserver_ip_address is defined and ansible_os_family == 'RedHat'
-  service:
-    name: firewalld
-    enabled: yes
-    state: started
-  tags:
-    - firewall
-    - server

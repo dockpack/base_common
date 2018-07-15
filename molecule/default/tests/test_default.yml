@@ -1,0 +1,8 @@
+# Molecule managed
+
+---
+file:
+  /etc/ansible/facts.d:
+    exists: true
+    owner: root
+    group: root
