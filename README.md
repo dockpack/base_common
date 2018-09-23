@@ -1,4 +1,4 @@
-=========
+[![Galaxy](https://img.shields.io/badge/galaxy-dockpack.base__common-blue.svg?style=flat)](https://galaxy.ansible.com/dockpack/base_common)[![Build Status](https://api.travis-ci.org/dockpack/base_common.svg)](https://travis-ci.org/dockpack/base_common)
 
 base_common is a role that other base roles depend on.
 
