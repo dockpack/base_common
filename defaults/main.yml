@@ -1,6 +1,0 @@
----
-
-server:
-    install: '1'
-    packages: [ca-certificates]
-    locale: en_US.UTF-8
