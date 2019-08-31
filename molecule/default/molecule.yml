@@ -10,9 +10,6 @@ platforms:
   - name: base-common-centos
     image: milcom/centos7-systemd
     privileged: True
-  - name: base-common-ubuntu
-    image: ubuntu
-    privileged: True
 provisioner:
   name: ansible
   config_options:
