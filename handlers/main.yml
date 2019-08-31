@@ -7,6 +7,27 @@
     enabled: yes
     state: restarted
 
-- name: update-ca-trust
-  become: yes
-  command: update-ca-trust
+- name: restart postfix
+  systemd:
+    name: postfix
+    daemon_reload: true
+    enabled: true
+    state: started
+
+- name: restart sshd
+  debug:
+    msg: "checking /etc/ssh/sshd_config first"
+  changed_when: true
+  notify:
+    - check sshd configuration
+    - restart sshd - after config check
+
+- name: check sshd configuration
+  command: '/usr/sbin/sshd -t'
+  register: sshd_config
+  changed_when: "sshd_config.rc != 0"
+
+- name: restart sshd - after config check
+  service:
+    name: sshd
+    state: restarted
