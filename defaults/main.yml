@@ -1,0 +1,8 @@
+---
+
+server:
+  install: true
+  packages:
+    - policycoreutils-python
+    - libsemanage-python
+    - postfix
