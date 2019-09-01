@@ -179,7 +179,7 @@
     - regexp: '^(#)?PermitEmptyPasswords'
       line: "PermitEmptyPasswords no"
     - regexp: '^(#)?RhostsRSAAuthentication'
-      line: "#RhostsRSAAuthentication deprecated option"
+      line: "RhostsRSAAuthentication no"
     - regexp: "^(#)?Protocol"
       line: "Protocol 2"
     - regexp: '^(#)?Ciphers'
