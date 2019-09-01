@@ -182,4 +182,12 @@
       line: "#RhostsRSAAuthentication deprecated option"
     - regexp: "^(#)?Protocol"
       line: "Protocol 2"
+    - regexp: '^(#)?Ciphers'
+      line: "Ciphers {{ Ciphers }}"
+    - regexp: '^(#)?KexAlgorithms'
+      line: "KexAlgorithms {{ KexAlgorithms }}"
+    - regexp: '^(#)?MACs'
+      line: "MACs {{ MACs }}"
+    - regexp: '^(#)?HostKeyAlgorithms'
+      line: "HostKeyAlgorithms {{ HostKeyAlgorithms }}"
   notify: restart sshd
