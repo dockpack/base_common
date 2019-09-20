@@ -7,7 +7,10 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: base-common-centos
+  - name: base-common-centos6
+    image: centos:6
+    privileged: True
+  - name: base-common-centos7
     image: milcom/centos7-systemd
     privileged: True
 provisioner:
