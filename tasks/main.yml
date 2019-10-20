@@ -15,10 +15,9 @@
       when: server.install|bool
       become: true
       package:
-        name: "{{ item }}"
+        name: "{{ server.packages }}"
         state: present
       retries: 3
-      with_items: "{{ server.packages }}"
       tags:
         - common
 
