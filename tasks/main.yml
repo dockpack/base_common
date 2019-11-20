@@ -45,7 +45,7 @@
 
     - name: check presence of postfix
       stat:
-        path: /etc/postfix/main.cf
+        path: /var/spool/postfix/pid/master.pid
       register: postfix
 
     - name: configure mail transfer agent for local-only mode
