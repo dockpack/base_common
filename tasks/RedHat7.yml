@@ -6,7 +6,10 @@
   package:
     name: "{{ item }}"
     state: present
+  register: package_install
+  until: package_install is success
   retries: 3
+  delay: 3
   with_items: "{{ server.packages }}"
   tags:
     - common
