@@ -4,23 +4,18 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
 platforms:
-  - name: base-common-centos6
-    image: centos:6
-    privileged: True
   - name: base-common-centos7
     image: milcom/centos7-systemd
-    privileged: True
+    privileged: true
+  - name: base-common-centos8
+    image: centos
+    privileged: true
 provisioner:
   name: ansible
-  config_options:
-    defaults:
-      remote_tmp: /tmp
-  playbooks:
-    converge: playbook.yml
-  lint:
-    name: ansible-lint
-scenario:
-  name: default
+verifier:
+  name: ansible

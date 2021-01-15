@@ -1,10 +1,10 @@
 ---
 
 - name: restart firewalld
-  become: yes
+  become: true
   service:
     name: firewalld
-    enabled: yes
+    enabled: true
     state: restarted
 
 - name: restart postfix

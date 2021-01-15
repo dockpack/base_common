@@ -1,5 +1,5 @@
 ---
-
+# yamllint disable rule:line-length
 server:
   install: true
   packages:
