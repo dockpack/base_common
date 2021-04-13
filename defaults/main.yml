@@ -7,12 +7,11 @@ server:
     - libsemanage-python
     - postfix
 
-
 # Set here to have a secure hostkey instead if the default ecdsa-sha2-nistp256
 # ecdsa-sha2-nistp256 is using weak elliptic curves
 # ecdsa-sha2-nistp256 has a weak random number generator could reveal the key
 ## Hostkey algorithm recommendations (for OpenSSH 7.4)
-HostKeyAlgorithms: ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
+HostKeyAlgorithms: ssh-ed25519-cert-v01@openssh.com,ssh-ed25519
 
 # These: aes128-cbc, aes192-cbc, aes256-cbc, blowfish-cbcm, cast128-cbc, 3des-cbc ...
 # were removed (in server) since OpenSSH 6.7, unsafe algorithms!
@@ -27,7 +26,7 @@ Ciphers: chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh
 #   diffie-hellman-group-exchange-sha1 removed (in server) since OpenSSH 6.7, unsafe algorithm
 #   diffie-hellman-group1-sha1 removed (in server) since OpenSSH 6.7, unsafe algorithm  disabled (in client) since OpenSSH 7.0, logjam attack
 ## Key exchange algorithms recommendations (for OpenSSH 7.4)
-KexAlgorithms: curve25519-sha256@libssh.org,diffie-hellman-group18-sha512,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256,diffie-hellman-group-exchange-sha256
+KexAlgorithms: curve25519-sha256@libssh.org,diffie-hellman-group18-sha512,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256
 
 # Message authentication code algorithms with issues:
 #   hmac-sha1 using weak hashing algorithm
@@ -35,4 +34,4 @@ KexAlgorithms: curve25519-sha256@libssh.org,diffie-hellman-group18-sha512,diffie
 #   umac-64@openssh.com using encrypt-and-MAC mode, using small 64-bit tag size
 #   umac-64-etm@openssh.com using small 64-bit tag size
 # Message authentication code algorithm recommendation
-MACs: hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512
+MACs: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
