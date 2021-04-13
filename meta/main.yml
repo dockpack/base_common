@@ -1,6 +1,8 @@
 ---
 # Standards: 0.2
 galaxy_info:
+  role_name: base_common
+  namespace: dockpack
   author: Bas Meijer
   description: Common Enterprise Stuff
   company: bbaassssiiee
