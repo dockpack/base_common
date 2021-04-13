@@ -42,6 +42,8 @@
         state: stopped
         enabled: false
       ignore_errors: true
+      when:
+        - portmapper.stat.exists
 
     - name: check presence of postfix
       stat:
@@ -182,7 +184,7 @@
         - regexp: '^(#)?PermitEmptyPasswords'
           line: "PermitEmptyPasswords no"
         - regexp: '^(#)?RhostsRSAAuthentication'
-          line: "RhostsRSAAuthentication no"
+          line: ''
         - regexp: "^(#)?Protocol"
           line: "Protocol 2"
         - regexp: '^(#)?Ciphers'
@@ -197,3 +199,36 @@
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version == "7"
+
+- name: check if /etc/ssh/moduli contains weak Diffie-Hellman parameters
+  shell: awk '$5 < 2048' /etc/ssh/moduli
+  register: sshd_register_moduli
+  no_log: true
+  changed_when: false
+  check_mode: false
+
+- name: deactivate short Diffie-Hellman moduli
+  when: sshd_register_moduli.stdout
+  shell: "awk '$5 >= 2048' /etc/ssh/moduli > /etc/ssh/moduli.tmp && mv -f /etc/ssh/moduli.tmp /etc/ssh/moduli"
+  tags:
+    - skip_ansible_lint
+
+- name: check the ed25519 host key
+  stat:
+    path: /etc/ssh/ssh_host_ed25519_key
+  register: ed25519
+
+- name: generate ed25519 host key
+  command: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+  when: ed25519.stat.exists is not defined
+  notify: restart sshd
+  changed_when: true
+
+- name: configure ed25519 host key
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^HostKey /etc/ssh/ssh_host_ed25519_key'
+    line: 'HostKey /etc/ssh/ssh_host_ed25519_key'
+    insertbefore: '^HostKey /etc/ssh/ssh_host_rsa_key'
+    state: present
+  notify: restart sshd
