@@ -1,0 +1,77 @@
+---
+# yamllint disable rule:line-length
+file:
+  /etc/issue:
+    exists: true
+    mode: "0644"
+    owner: root
+    group: root
+    filetype: file
+    contains: []
+  /etc/security/access.conf:
+    exists: true
+    mode: "0644"
+    owner: root
+    group: root
+    filetype: file
+    contains: []
+  /etc/ssh/moduli:
+    exists: true
+    mode: "0644"
+    owner: root
+    group: root
+    filetype: file
+    contains: []
+  /etc/ssh/ssh_host_ed25519_key:
+    exists: true
+    mode: "0640"
+  /etc/ssh/ssh_host_ed25519_key.pub:
+    exists: true
+    mode: "0644"
+  /etc/ssh/ssh_host_ecdsa_key:
+    exists: true
+    mode: "0666"
+  /etc/ssh/ssh_host_ecdsa_key.pub:
+    exists: true
+    mode: "0666"
+  /etc/ssh/ssh_host_rsa_key:
+    exists: true
+    mode: "0666"
+  /etc/ssh/ssh_host_rsa_key.pub:
+    exists: true
+    mode: "0666"
+  /etc/ssh/sshd_config:
+    exists: true
+    mode: "0600"
+    owner: root
+    group: root
+    contains:
+      - ChallengeResponseAuthentication no
+      - Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      - HostKey /etc/ssh/ssh_host_ed25519_key
+      - KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group18-sha512,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256
+      - MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+      # - PasswordAuthentication no
+      # - PermitRootLogin no
+      - PermitEmptyPasswords no
+      - PubkeyAuthentication yes
+      - StrictModes yes
+      - UsePAM yes
+package:
+  openssh-server:
+    installed: true
+  pam:
+    installed: true
+user:
+  sshd:
+    exists: true
+    groups:
+      - sshd
+    home: /var/empty/sshd
+    shell: /sbin/nologin
+group:
+  sshd:
+    exists: true
+process:
+  sshd:
+    running: true
