@@ -10,11 +10,21 @@ lint: |
   ansible-lint
 platforms:
   - name: base-common-centos7
-    image: milcom/centos7-systemd
-    privileged: true
+    image: centos:7
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
   - name: base-common-centos8
-    image: centos
-    privileged: true
+    image: centos:8
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
 verifier:
