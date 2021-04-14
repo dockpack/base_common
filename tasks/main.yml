@@ -10,17 +10,36 @@
   tags:
     - common
 
-- block:
-    - name: Install packages
-      when: server.install|bool
-      become: true
-      package:
-        name: "{{ server.packages }}"
-        state: present
-      retries: 3
-      tags:
-        - common
+- name: include variable based on OS version
+  # yamllint disable-line rule:line-length
+  include_vars: "{{ ansible_os_family }}{{ ansible_distribution_major_version }}.yml"
+  tags: always
 
+- name: install libraries for ansible selinux
+  package:
+    name: "{{ ansible_libraries }}"
+    state: present
+  retries: 3
+  tags:
+    - common
+
+- name: install server.packages
+  when: server.install|bool
+  package:
+    name: "{{ server.packages }}"
+    state: present
+  retries: 3
+  tags:
+    - common
+
+- name: start ssh daemon
+  when: server.install|bool
+  systemd:
+    name: sshd
+    state: started
+    enabled: true
+
+- block:
     - name: check presence of portmapper
       stat:
         path: /var/run/rpcbind.sock
@@ -162,45 +181,52 @@
       file:
         path: /var/log/dmesg
         mode: 0640
-
-    - name: check presence of sshd_config file
-      stat:
-        path: /etc/ssh/sshd_config
-      register: sshd_config
-
-    - name: SSH server configuration
-      when: sshd_config.stat.exists
-      lineinfile:
-        dest: /etc/ssh/sshd_config
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-        state: present
-        mode: 0600
-      with_items:
-        - regexp: '^(#)?HostbasedAuthentication'
-          line: "HostbasedAuthentication no"
-        - regexp: '^(#)?IgnoreRhosts'
-          line: 'IgnoreRhosts yes'
-        - regexp: '^(#)?PermitEmptyPasswords'
-          line: "PermitEmptyPasswords no"
-        - regexp: '^(#)?RhostsRSAAuthentication'
-          line: ''
-        - regexp: "^(#)?Protocol"
-          line: "Protocol 2"
-        - regexp: '^(#)?Ciphers'
-          line: "Ciphers {{ Ciphers }}"
-        - regexp: '^(#)?KexAlgorithms'
-          line: "KexAlgorithms {{ KexAlgorithms }}"
-        - regexp: '^(#)?MACs'
-          line: "MACs {{ MACs }}"
-        - regexp: '^(#)?HostKeyAlgorithms'
-          line: "HostKeyAlgorithms {{ HostKeyAlgorithms }}"
-      notify: restart sshd
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version == "7"
 
+- name: check presence of sshd_config file
+  stat:
+    path: /etc/ssh/sshd_config
+  register: sshd_config
+
+- name: SSH server configuration
+  when: sshd_config.stat.exists
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    mode: 0600
+  with_items:
+    - regexp: '^(#)?HostbasedAuthentication'
+      line: "HostbasedAuthentication no"
+    - regexp: '^(#)?IgnoreRhosts'
+      line: 'IgnoreRhosts yes'
+    - regexp: '^(#)?PermitEmptyPasswords'
+      line: "PermitEmptyPasswords no"
+    - regexp: '^(#)?RhostsRSAAuthentication'
+      line: ''
+    - regexp: "^(#)?Protocol"
+      line: "Protocol 2"
+    - regexp: '^(#)?Ciphers'
+      line: "Ciphers {{ Ciphers }}"
+    - regexp: '^(#)?KexAlgorithms'
+      line: "KexAlgorithms {{ KexAlgorithms }}"
+    - regexp: '^(#)?MACs'
+      line: "MACs {{ MACs }}"
+    - regexp: '^(#)?HostKeyAlgorithms'
+      line: "HostKeyAlgorithms {{ HostKeyAlgorithms }}"
+    - regexp: '^(#)?HostKey /etc/ssh/ssh_host_rsa_key'
+      line: '# HostKey /etc/ssh/ssh_host_rsa_key'
+    - regexp: '^(#)?HostKey /etc/ssh/ssh_host_dsa_key'
+      line: '# HostKey /etc/ssh/ssh_host_dsa_key'
+    - regexp: '^(#)?HostKey /etc/ssh/ssh_host_ecdsa_key'
+      line: '# HostKey /etc/ssh/ssh_host_ecdsa_key'
+  notify: restart sshd
+
 - name: check if /etc/ssh/moduli contains weak Diffie-Hellman parameters
+  when: sshd_config.stat.exists|bool
   shell: awk '$5 < 2048' /etc/ssh/moduli
   register: sshd_register_moduli
   no_log: true
@@ -208,28 +234,40 @@
   check_mode: false
 
 - name: deactivate short Diffie-Hellman moduli
-  when: sshd_register_moduli.stdout
+  when:
+    - sshd_config.stat.exists
+    - sshd_register_moduli.stdout
   # yamllint disable-line rule:line-length
   shell: "awk '$5 >= 2048' /etc/ssh/moduli > /etc/ssh/moduli.tmp && mv -f /etc/ssh/moduli.tmp /etc/ssh/moduli"
   tags:
     - skip_ansible_lint
 
 - name: check the ed25519 host key
+  when: sshd_config.stat.exists
   stat:
     path: /etc/ssh/ssh_host_ed25519_key
   register: ed25519
 
 - name: generate ed25519 host key
   command: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
-  when: ed25519.stat.exists is not defined
+  when:
+    - sshd_config.stat.exists|bool
+    - not ed25519.stat.exists|bool
   notify: restart sshd
   changed_when: true
 
 - name: configure ed25519 host key
+  when: sshd_config.stat.exists
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^HostKey /etc/ssh/ssh_host_ed25519_key'
     line: 'HostKey /etc/ssh/ssh_host_ed25519_key'
-    insertbefore: '^HostKey /etc/ssh/ssh_host_rsa_key'
+    insertbefore: '^# HostKey /etc/ssh/ssh_host_rsa_key'
     state: present
   notify: restart sshd
+
+- name: disable weak host keys
+  file:
+    path: "/etc/ssh/{{ item }}"
+    mode: 0666
+  with_items: "{{ weak_host_keys }}"
