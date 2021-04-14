@@ -1,4 +1,10 @@
 ---
 - hosts: all
+  vars:
+    server:
+      install: true
+      packages:
+        - openssh-server
+        - postfix
   roles:
     - role: base_common
