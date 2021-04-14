@@ -1,10 +1,12 @@
 # these python extensions are for testing
 tox
 sh==1.12.14
+ansible<2.10.0
 molecule
 molecule-docker
 yamllint
 ansible-lint
 docker==4.2.2
+ssh-audit
 anyconfig>=0.10.0 # not directly required, pinned by Snyk to avoid a vulnerability
 
