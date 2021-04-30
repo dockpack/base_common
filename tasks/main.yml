@@ -267,7 +267,5 @@
   notify: restart sshd
 
 - name: disable weak host keys
-  file:
-    path: "/etc/ssh/{{ item }}"
-    mode: 0666
-  with_items: "{{ weak_host_keys }}"
+  include_tasks: weak_keys.yml
+  loop: "{{ weak_host_keys }}"
