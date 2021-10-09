@@ -1,4 +1,5 @@
 ---
+
 # yamllint disable rule:line-length
 file:
   /etc/issue:
@@ -75,3 +76,4 @@ group:
 process:
   sshd:
     running: true
+...

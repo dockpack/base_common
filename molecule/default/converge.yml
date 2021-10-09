@@ -1,4 +1,5 @@
 ---
+# Standards: 0.2
 - hosts: all
   become: true
   vars:
@@ -9,3 +10,4 @@
         - postfix
   roles:
     - role: base_common
+...
