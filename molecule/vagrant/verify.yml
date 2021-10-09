@@ -1,6 +1,6 @@
 ---
 # This is an example playbook to execute Ansible tests.
-
+# Standards: 0.2
 - name: Verify
   hosts: all
   gather_facts: false
@@ -8,3 +8,4 @@
   - name: Example assertion
     assert:
       that: true
+...

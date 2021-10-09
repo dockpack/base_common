@@ -1,5 +1,5 @@
 ---
-
+# Standards: 0.2
 - name: Ensure facts can be stored locally
   file:
     path: /etc/ansible/facts.d
@@ -10,12 +10,12 @@
   tags:
     - common
 
-- name: include variable based on OS version
+- name: Include variable based on OS version
   # yamllint disable-line rule:line-length
   include_vars: "{{ ansible_os_family }}{{ ansible_distribution_major_version }}.yml"
   tags: always
 
-- name: install libraries for ansible selinux
+- name: Install libraries for ansible selinux
   package:
     name: "{{ ansible_libraries }}"
     state: present
@@ -23,7 +23,7 @@
   tags:
     - common
 
-- name: install server.packages
+- name: Install server.packages
   when: server.install|bool
   package:
     name: "{{ server.packages }}"
@@ -32,7 +32,7 @@
   tags:
     - common
 
-- name: start ssh daemon
+- name: Start ssh daemon
   when: server.install|bool
   systemd:
     name: sshd
@@ -40,12 +40,12 @@
     enabled: true
 
 - block:
-    - name: check presence of portmapper
+    - name: Check presence of portmapper
       stat:
         path: /var/run/rpcbind.sock
       register: portmapper
 
-    - name: stop portmapper
+    - name: Stop portmapper
       systemd:
         name: rpcbind.socket
         state: stopped
@@ -55,7 +55,7 @@
       when:
         - portmapper.stat.exists
 
-    - name: disable portmapper
+    - name: Disable portmapper
       systemd:
         name: rpcbind.service
         state: stopped
@@ -64,12 +64,12 @@
       when:
         - portmapper.stat.exists
 
-    - name: check presence of postfix
+    - name: Check presence of postfix
       stat:
         path: /var/spool/postfix/pid/master.pid
       register: postfix
 
-    - name: configure mail transfer agent for local-only mode
+    - name: Configure mail transfer agent for local-only mode
       when:
         - postfix.stat.exists
       lineinfile:
@@ -78,9 +78,9 @@
         line: 'inet_interfaces = localhost'
         state: present
         mode: 0644
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: configure mail transfer agent for mydomain
+    - name: Configure mail transfer agent for mydomain
       when:
         - postfix.stat.exists
         - mydomain is defined
@@ -90,9 +90,9 @@
         line: 'mydomain = {{ mydomain }}'
         state: present
         mode: 0644
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: configure mail transfer agent for mydomain.mydomain
+    - name: Configure mail transfer agent for mydomain.mydomain
       when:
         - postfix.stat.exists
         - mydomain is defined
@@ -103,9 +103,9 @@
         state: present
         mode: 0644
       ignore_errors: true
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: configure mail transfer agent for smtp
+    - name: Configure mail transfer agent for smtp
       when:
         - postfix.stat.exists
         - mydomain is defined
@@ -116,9 +116,9 @@
         state: present
         mode: 0644
       ignore_errors: true
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: do not disclose software version in SMTP banner
+    - name: Do not disclose software version in SMTP banner
       when:
         - postfix.stat.exists
       lineinfile:
@@ -127,9 +127,9 @@
         line: 'smtpd_banner = $myhostname ESMTP'
         state: present
         mode: 0644
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: configure mail transfer agent for ipv4 only
+    - name: Configure mail transfer agent for ipv4 only
       when:
         - postfix.stat.exists
       lineinfile:
@@ -139,9 +139,9 @@
         state: present
         mode: 0644
       ignore_errors: true
-      notify: restart postfix
+      notify: Restart postfix
 
-    - name: remove rsh trust files
+    - name: Remove rsh trust files
       file:
         path: "{{ item }}"
         state: absent
@@ -149,7 +149,7 @@
         - /etc/hosts.equiv
         - /root/hosts.equiv
 
-    - name: manage kernel modules
+    - name: Manage kernel modules
       copy:
         src: modprobe.conf
         dest: /etc/modprobe.d/CIS.conf
@@ -157,12 +157,12 @@
         group: root
         mode: 0644
 
-    - name: check presence of sysconfig network file
+    - name: Check presence of sysconfig network file
       stat:
         path: /etc/sysconfig/network
       register: sysconfig
 
-    - name: disable zeroconf networking
+    - name: Disable zeroconf networking
       when: sysconfig.stat.exists
       lineinfile:
         dest: /etc/sysconfig/network
@@ -171,12 +171,12 @@
         state: present
         mode: 0644
 
-    - name: check presence of dmesg logfile
+    - name: Check presence of dmesg logfile
       stat:
         path: /var/log/dmesg
       register: dmesg_logfile
 
-    - name: restrict permissions on dmesg logfile
+    - name: Restrict permissions on dmesg logfile
       when: dmesg_logfile.stat.exists
       file:
         path: /var/log/dmesg
@@ -185,7 +185,7 @@
     - ansible_os_family == 'RedHat'
     - ansible_distribution_major_version == "7"
 
-- name: check presence of sshd_config file
+- name: Check presence of sshd_config file
   stat:
     path: /etc/ssh/sshd_config
   register: sshd_config
@@ -223,9 +223,9 @@
       line: '# HostKey /etc/ssh/ssh_host_dsa_key'
     - regexp: '^(#)?HostKey /etc/ssh/ssh_host_ecdsa_key'
       line: '# HostKey /etc/ssh/ssh_host_ecdsa_key'
-  notify: restart sshd
+  notify: Restart sshd
 
-- name: check if /etc/ssh/moduli contains weak Diffie-Hellman parameters
+- name: Check if /etc/ssh/moduli contains weak Diffie-Hellman parameters
   when: sshd_config.stat.exists|bool
   shell: awk '$5 < 2048' /etc/ssh/moduli
   register: sshd_register_moduli
@@ -233,30 +233,28 @@
   changed_when: false
   check_mode: false
 
-- name: deactivate short Diffie-Hellman moduli
+- name: Deactivate short Diffie-Hellman moduli
   when:
     - sshd_config.stat.exists
     - sshd_register_moduli.stdout
   # yamllint disable-line rule:line-length
   shell: "awk '$5 >= 2048' /etc/ssh/moduli > /etc/ssh/moduli.tmp && mv -f /etc/ssh/moduli.tmp /etc/ssh/moduli"
-  tags:
-    - skip_ansible_lint
 
-- name: check the ed25519 host key
+- name: Check the ed25519 host key
   when: sshd_config.stat.exists
   stat:
     path: /etc/ssh/ssh_host_ed25519_key
   register: ed25519
 
-- name: generate ed25519 host key
+- name: Generate ed25519 host key
   command: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
   when:
     - sshd_config.stat.exists|bool
     - not ed25519.stat.exists|bool
-  notify: restart sshd
+  notify: Restart sshd
   changed_when: true
 
-- name: configure ed25519 host key
+- name: Configure ed25519 host key
   when: sshd_config.stat.exists
   lineinfile:
     dest: /etc/ssh/sshd_config
@@ -264,8 +262,9 @@
     line: 'HostKey /etc/ssh/ssh_host_ed25519_key'
     insertbefore: '^# HostKey /etc/ssh/ssh_host_rsa_key'
     state: present
-  notify: restart sshd
+  notify: Restart sshd
 
-- name: disable weak host keys
+- name: Disable weak host keys
   include_tasks: weak_keys.yml
   loop: "{{ weak_host_keys }}"
+...
