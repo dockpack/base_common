@@ -2,7 +2,7 @@
 # Standards: 0.2
 - name: Restart firewalld
   become: true
-  become_user: true
+  become_user: root
   service:
     name: firewalld
     enabled: true
@@ -10,7 +10,7 @@
 
 - name: Restart postfix
   become: true
-  become_user: true
+  become_user: root
   systemd:
     name: postfix
     daemon_reload: true
@@ -19,7 +19,7 @@
 
 - name: Restart sshd
   become: true
-  become_user: true
+  become_user: root
   debug:
     msg: "checking /etc/ssh/sshd_config first"
   changed_when: true
@@ -29,14 +29,14 @@
 
 - name: Check sshd configuration
   become: true
-  become_user: true
+  become_user: root
   command: '/usr/sbin/sshd -t'
   register: sshd_config
   changed_when: "sshd_config.rc != 0"
 
 - name: Restart sshd - after config check
   become: true
-  become_user: true
+  become_user: root
   service:
     name: sshd
     state: restarted
