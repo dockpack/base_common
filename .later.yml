@@ -8,10 +8,26 @@ ansible:
 
   # List of allowed literal bools (ANSIBLE0014)
   literal-bools:
-    - "true"
-    - "false"
+    - 'true'
+    - 'false'
 rules:
   exclude_files:
-    - molecule/default/tests
+    - molecule
 
+  named-task:
+    exclude:
+      - 'meta'
+      - 'debug'
+      - 'block'
+
+  native-yaml:
+    exclude:
+      - 'debug'
+
+logging:
+  # You can enable JSON logging if a parsable output is required
+  json: True
+
+  # Possible options debug | info | warning | error | critical
+  level: 'ERROR'
 ...

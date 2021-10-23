@@ -1,5 +1,4 @@
 ---
-# Standards: 0.2
 - name: Ensure facts can be stored locally
   file:
     path: /etc/ansible/facts.d

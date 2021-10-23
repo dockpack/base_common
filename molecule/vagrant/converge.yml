@@ -1,5 +1,4 @@
 ---
-# Standards: 0.2
 - name: Converge
   hosts: all
   become: true

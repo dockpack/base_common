@@ -1,5 +1,4 @@
 ---
-# Standards: 0.2
 ansible_libraries:
     - policycoreutils-python
     - libsemanage-python
