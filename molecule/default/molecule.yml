@@ -18,7 +18,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
   - name: base-common-centos8
-    image: centos:8
+    image: quay.io/centos/centos:stream8
     command: /sbin/init
     tmpfs:
       - /run
