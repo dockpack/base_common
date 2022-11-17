@@ -38,7 +38,8 @@
     state: started
     enabled: true
 
-- block:
+- name: RedHat 7 tasks
+  block:
     - name: Check presence of portmapper
       stat:
         path: /var/run/rpcbind.sock

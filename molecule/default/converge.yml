@@ -8,5 +8,5 @@
         - openssh-server
         - postfix
   roles:
-    - role: base_common
+    - role: dockpack.base_common
 ...
