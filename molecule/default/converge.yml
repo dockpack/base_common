@@ -1,12 +1,17 @@
 ---
-- hosts: all
+- name: Converge
+  hosts: all
   become: true
   vars:
+    role_name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
     server:
       install: true
       packages:
         - openssh-server
         - postfix
-  roles:
-    - role: dockpack.base_common
+
+  tasks:
+    - name: "Include {{ role_name }}"
+      ansible.builtin.include_role:
+        name: "{{ role_name }}"
 ...
