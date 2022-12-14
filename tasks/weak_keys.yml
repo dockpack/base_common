@@ -1,15 +1,15 @@
 ---
-- name: "Check weak key presence for {{ item }}"
+- name: "Check weak key presence for {{ the_key }}"
   stat:
-    path: "/etc/ssh/{{ item }}"
+    path: "/etc/ssh/{{ the_key }}"
   register:
     weak_key_found
 
-- name: "Disable weak host key {{ item }}"
+- name: "Disable weak host key {{ the_key }}"
   when:
     - weak_key_found.stat.exists is defined
     - weak_key_found.stat.exists|bool
   file:
-    path: "/etc/ssh/{{ item }}"
+    path: "/etc/ssh/{{ the_key }}"
     mode: 0666
 ...
