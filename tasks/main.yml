@@ -267,4 +267,6 @@
 - name: Disable weak host keys
   include_tasks: weak_keys.yml
   loop: "{{ weak_host_keys }}"
+  loop_control:
+    loop_var: the_key
 ...
