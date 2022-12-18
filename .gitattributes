@@ -61,6 +61,3 @@ test_*.yml text eol=lf linguist-language=Goss
 .gitattributes export-ignore
 .gitignore     export-ignore
 .gitkeep       export-ignore
-
-
-
